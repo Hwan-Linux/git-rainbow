@@ -1,0 +1,83 @@
+{% load i18n custom_tags %}
+<!-- Modal title -->
+<p class="mb-2 text-2xl font-semibold text-gray-700 dark:text-gray-300">
+    {% trans "Git repositories" %}
+  </p>
+  {% if not is_joined %}
+    <p class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+      {% trans "Using token" %}
+    </p>
+    <hr style="margin-bottom: 15px; width: 83%;">
+    <div>
+      <input id="token_input" type="text" placeholder={% blocktrans %}"Enter GitHub personal access token"{% endblocktrans %} style="width: 83%; height: 70px; padding: 10px; border-width: 1px;"/>
+      <button onclick="analyze_developer('{{github_user.github_id}}', true, true)" class="ml-1 p-2 font-medium leading-5 text-center transition-colors duration-150 border border-transparent" style="background-color: #A4C2F4;border-radius: 10px; height: 70px; width:125px;">
+        {% trans "Add repository" %}
+      </button>
+      <div><span class="text-xs text-red-600 dark:text-red-400"></span></div>
+    </div>
+  {% endif %}
+  <br>
+  <p class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+    {% trans "Public" %}
+  </p>
+  <hr style="margin-bottom: 15px; width: 83%;">
+  <div>
+    <input id="public_repo_input" type="text" placeholder={% blocktrans %}"Git Repository URL"{% endblocktrans %} style="width: 83%; height: 70px; padding: 10px; border-width:1px;"/>
+    <button onclick="save_public_repo()" class="ml-1 p-2 font-medium leading-5 text-center transition-colors duration-150 border border-transparent" style="background-color: #fd9bad;border-radius: 10px; height: 70px; width:125px; ">
+      {% trans "Add" %}
+    </button>
+  </div>
+  <br>
+  <div class="flex justify-between">
+    <p class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+      {% trans "All repositories" %}
+    </p>
+    <button onclick="delete_repos()" class="ml-1 p-2 font-medium leading-5 text-center transition-colors duration-150 border border-transparent" style="background-color: #d4d4d4;border-radius: 10px; height: 35px; width:125px;">
+      Delete
+    </button>
+  </div>
+  <hr style="margin-bottom: 15px; width: 83%;">
+  <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
+    <div style="height: 250px;" class="w-full overflow-x-auto">
+      <table class="w-full whitespace-no-wrap">
+        <thead>
+            <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+              <th class="px-1 py-2">No.</th>
+              <th class="px-1 py-2"><input type="checkbox" id="repo_all"></th>
+              <th class="px-1 py-2">{% trans "Git project name" %}</th>
+              <th class="px-1 py-2">{% trans "Git repository URL" %}</th>
+              <th class="px-1 py-2">{% trans "Type" %}</th>
+              <th class="px-1 py-2">{% trans "Status" %}</th>
+              <th class="px-1 py-2">{% trans "Is private" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% if is_joined %}
+            {% for repo in group_repo_queryset %}
+              <tr class="text-gray-700 dark:text-gray-400">
+                <td class="px-1 py-2">{{forloop.counter}}</td>
+                <th class="px-1 py-2"><input type="checkbox" class="repos" repo_id="{{repo.id}}"></th>
+                <td class="px-1 py-2">{{repo.repo_url|get_repo_name}}</td>
+                <td class="px-1 py-2"><a href="{{repo.repo_url}}">{{repo.repo_url}}</a></td>
+                <td class="px-1 py-2">group</td>
+                <td class="px-1 py-2">{{repo.status}}</td>
+                <td class="px-1 py-2">{{repo.is_private}}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            {% for repo in github_user.githubrepo_set.all %}
+              <tr class="text-gray-700 dark:text-gray-400">
+                <td class="px-1 py-2">{{forloop.counter}}</td>
+                <th class="px-1 py-2"><input type="checkbox" class="repos" repo_id="{{repo.id}}"></th>
+                <td class="px-1 py-2">{{repo.repo_url|get_repo_name}}</td>
+                <td class="px-1 py-2"><a href="{{repo.repo_url}}">{{repo.repo_url}}</a></td>
+                <td class="px-1 py-2">{{repo.added_type}}</td>
+                <td class="px-1 py-2">{{repo.status}}</td>
+                <td class="px-1 py-2">{{repo.is_private}}</td>
+              </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
