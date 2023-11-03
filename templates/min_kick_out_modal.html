@@ -1,0 +1,15 @@
+{% load static i18n %}
+<p class="mb-2 text-2xl font-semibold text-gray-700 dark:text-gray-300">Members</p>
+<div style="display: flex; justify-content: end; margin-bottom: 5px;">
+  <button onclick="kick_out_members('{{ group.id }}')" class="ml-1 p-2 font-medium leading-5 text-center transition-colors duration-150 border border-transparent" style="background-color: #ffc6d1;border-radius: 10px; height: 50px; width:125px;" >Kick out</button>
+</div>
+<div>
+{% for github_user in group.github_users.all %}
+  <div class="flex align-center p-1" style="border: 1px solid rgb(210, 210, 210)">
+    <span class="mr-2 ml-2">{{ forloop.counter }}</span>
+    <input type="checkbox" class="kick_out_modal_list" github_id="{{ github_user.github_id }}" class="mr-2" {% if group.owner.github_id == github_user.github_id %}disabled{% endif %}>
+    <img src="{{ github_user.avatar_url }}" class="object-cover w-full h-full rounded-full mx-2 my-2" style="width: 32px; height: 32px;" class="mr-2">
+    <span>{{ github_user.github_id }}</span>
+  </div>
+{% endfor %}
+</div>

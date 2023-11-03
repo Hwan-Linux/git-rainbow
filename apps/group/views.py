@@ -10,7 +10,8 @@ from dateutil.relativedelta import relativedelta
 from django.db.models import Sum, F, FloatField, Case, Value, When
 from django.db.models.functions import TruncDate
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.template import loader
 from django.contrib.auth.decorators import login_required
 from urllib.parse import urlparse
 
@@ -477,4 +478,36 @@ def get_out_group(request, group_id):
         return JsonResponse({"status": "fail", "reason": "Owners cannot leave the group"})
 
     user_group.github_users.remove(github_user)
+    return JsonResponse({"status":"success"})
+
+
+@login_required(login_url='/login/github')
+def get_group_modal_html(request, group_id, repo_or_kick_out):
+    group = Group.objects.filter(id=group_id).first()
+    context = {'is_joined': True, 'group': group}
+    template_path = 'min_kick_out_modal.html'
+    if repo_or_kick_out == 'repo':
+        group_repo_queryset = group.grouprepo_set.all()
+        context['group_repo_queryset'] = group_repo_queryset
+        template_path = 'min_token_modal.html'
+    template = loader.get_template(template_path)
+    return HttpResponse(template.render(context, request))
+
+
+@login_required(login_url='/login/github')
+def kick_out_members(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": "fail", "reason": "Not allowed method"})
+
+    data = request.POST
+    group_id = data.get('group_id')
+    group = Group.objects.filter(id=group_id).first()
+    if not group:
+        return JsonResponse({"status":"fail", "reason": "That group does not exist"})
+
+    if request.user != group.owner:
+        return JsonResponse({"status":"fail", "reason": "You are not ower of this group"})
+
+    kick_out_list = json.loads(data.get('kick_out_list'))
+    group.github_users.remove(*kick_out_list)
     return JsonResponse({"status":"success"})
