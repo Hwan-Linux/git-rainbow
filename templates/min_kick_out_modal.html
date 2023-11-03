@@ -4,12 +4,48 @@
   <button onclick="kick_out_members('{{ group.id }}')" class="ml-1 p-2 font-medium leading-5 text-center transition-colors duration-150 border border-transparent" style="background-color: #ffc6d1;border-radius: 10px; height: 50px; width:125px;" >Kick out</button>
 </div>
 <div>
-{% for github_user in group.github_users.all %}
-  <div class="flex align-center p-1" style="border: 1px solid rgb(210, 210, 210)">
-    <span class="mr-2 ml-2">{{ forloop.counter }}</span>
-    <input type="checkbox" class="kick_out_modal_list" github_id="{{ github_user.github_id }}" class="mr-2" {% if group.owner.github_id == github_user.github_id %}disabled{% endif %}>
-    <img src="{{ github_user.avatar_url }}" class="object-cover w-full h-full rounded-full mx-2 my-2" style="width: 32px; height: 32px;" class="mr-2">
-    <span>{{ github_user.github_id }}</span>
-  </div>
-{% endfor %}
+<table class="w-full whitespace-no-wrap">
+  <thead>
+    <tr
+      class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800"
+      style="border: 0 solid #d5d6d7!important;">
+      <th class="px-4 py-3 text-center">No.</th>
+      <th></th>
+      <th class="px-4 py-3 text-center">GitHub ID</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+    {% for github_user in group.github_users.all %}
+    <tr class="user_tr text-gray-700 dark:text-gray-400" style="border: 0.5 solid #d5d6d7!important;">
+      <td style="width:20px;border:none!important; text-align: center;">
+        <p class="font-bold text-sm text-gray-600 dark:text-gray-400">
+          {{ forloop.counter }}
+        </p>
+      </td>
+      <td class="text-sm text-center" style="border:none!important">
+        <input type="checkbox" class="kick_out_modal_list" github_id="{{ github_user.github_id }}" class="mr-2" {% if group.owner.github_id == github_user.github_id %}disabled{% endif %}>
+      </td>
+      <td class="px-3 py-3" style="width:150px;border:none!important">
+        <div class="flex items-center text-sm">
+          <!-- Avatar with inset shadow -->
+          <div class="relative hidden w-8 h-8 mr-3 rounded-full md:block" style="min-width:32px;">
+            <img class="object-cover w-full h-full rounded-full"
+                src="{{ github_user.avatar_url }}" loading="lazy">
+            <div class="absolute inset-0 rounded-full shadow-inner" aria-hidden="true"></div>
+          </div>
+          <div class="ranking-ellipsis">
+            <a class="font-semibold" href="/{{ github_user.github_id }}" target="_blank">{{ github_user.github_id }}</a>
+          </div>
+        </div>
+      </td>
+      <td style="width:150px;border:none"></td>
+      <td style="width:150px;border:none"></td>
+      <td style="width:150px;border:none"></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 </div>
